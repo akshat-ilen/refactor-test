@@ -2,12 +2,8 @@ import { TennisGame } from './TennisGame';
 
 
 export class TennisGame2 implements TennisGame {
-  P1point: number = 0;
-  P2point: number = 0;
-
-  P1res: string = '';
-  P2res: string = '';
-
+  private player1Score: number = 0;
+  private player2Score: number = 0;
   private player1Name: string;
   private player2Name: string;
 
@@ -18,109 +14,66 @@ export class TennisGame2 implements TennisGame {
 
   getScore(): string {
     let score: string = '';
-    if (this.P1point === this.P2point && this.P1point < 4) {
-      if (this.P1point === 0)
-        score = 'Love';
-      if (this.P1point === 1)
-        score = 'Fifteen';
-      if (this.P1point === 2)
-        score = 'Thirty';
+    let player1ScoreName: string = ''
+    let player2ScoreName: string = ''
+    const scoreNameMap: string[] = ['Love', 'Fifteen', 'Thirty', 'Forty'];
+
+    if(this.player1Score < 4) player1ScoreName = scoreNameMap[this.player1Score];
+    if(this.player2Score < 4) player2ScoreName = scoreNameMap[this.player2Score];
+
+    if (this.player1Score === this.player2Score && this.player1Score < 4) {
+      score = player1ScoreName;
       score += '-All';
     }
-    if (this.P1point === this.P2point && this.P1point >= 3)
+    if (this.player1Score === this.player2Score && this.player1Score >= 3)
       score = 'Deuce';
 
-    if (this.P1point > 0 && this.P2point === 0) {
-      if (this.P1point === 1)
-        this.P1res = 'Fifteen';
-      if (this.P1point === 2)
-        this.P1res = 'Thirty';
-      if (this.P1point === 3)
-        this.P1res = 'Forty';
-
-      this.P2res = 'Love';
-      score = this.P1res + '-' + this.P2res;
-    }
-    if (this.P2point > 0 && this.P1point === 0) {
-      if (this.P2point === 1)
-        this.P2res = 'Fifteen';
-      if (this.P2point === 2)
-        this.P2res = 'Thirty';
-      if (this.P2point === 3)
-        this.P2res = 'Forty';
-
-      this.P1res = 'Love';
-      score = this.P1res + '-' + this.P2res;
+    if ((this.player1Score > this.player2Score && this.player1Score < 4) ||
+      (this.player2Score > this.player1Score && this.player2Score < 4) ||
+      (this.player1Score > 0 && this.player2Score === 0) ||
+      (this.player2Score > 0 && this.player1Score === 0)) {
+      score = player1ScoreName + '-' + player2ScoreName;
     }
 
-    if (this.P1point > this.P2point && this.P1point < 4) {
-      if (this.P1point === 2)
-        this.P1res = 'Thirty';
-      if (this.P1point === 3)
-        this.P1res = 'Forty';
-      if (this.P2point === 1)
-        this.P2res = 'Fifteen';
-      if (this.P2point === 2)
-        this.P2res = 'Thirty';
-      score = this.P1res + '-' + this.P2res;
-    }
-    if (this.P2point > this.P1point && this.P2point < 4) {
-      if (this.P2point === 2)
-        this.P2res = 'Thirty';
-      if (this.P2point === 3)
-        this.P2res = 'Forty';
-      if (this.P1point === 1)
-        this.P1res = 'Fifteen';
-      if (this.P1point === 2)
-        this.P1res = 'Thirty';
-      score = this.P1res + '-' + this.P2res;
+    let dominantPlayer = (this.player1Score > this.player2Score) ? this.player1Name : this.player2Name
+    
+    if ((this.player1Score > this.player2Score && this.player2Score >= 3) ||
+    (this.player2Score > this.player1Score && this.player1Score >= 3)) {
+      score = `Advantage ${dominantPlayer}`;
     }
 
-    if (this.P1point > this.P2point && this.P2point >= 3) {
-      score = 'Advantage player1';
+    if ((this.player1Score >= 4 && this.player2Score >= 0 && (this.player1Score - this.player2Score) >= 2) ||
+    (this.player2Score >= 4 && this.player1Score >= 0 && (this.player2Score - this.player1Score) >= 2)) {
+      score = `Win for ${dominantPlayer}`;
     }
 
-    if (this.P2point > this.P1point && this.P1point >= 3) {
-      score = 'Advantage player2';
-    }
-
-    if (this.P1point >= 4 && this.P2point >= 0 && (this.P1point - this.P2point) >= 2) {
-      score = 'Win for player1';
-    }
-    if (this.P2point >= 4 && this.P1point >= 0 && (this.P2point - this.P1point) >= 2) {
-      score = 'Win for player2';
-    }
     return score;
   }
 
   SetP1Score(score: number): void {
-
     for (let i = 0; i < score; i++) {
-      this.P1Score();
+      this.increaseP1Score();
     }
-
   }
 
   SetP2Score(score: number): void {
-
     for (let i = 0; i < score; i++) {
-      this.P2Score();
+      this.increaseP2Score();
     }
-
-  }
-
-  P1Score(): void {
-    this.P1point++;
-  }
-
-  P2Score(): void {
-    this.P2point++;
   }
 
   wonPoint(player: string): void {
-    if (player === 'player1')
-      this.P1Score();
-    else
-      this.P2Score();
+    if (player === this.player1Name)
+      this.increaseP1Score();
+    else if (player === this.player2Name)
+      this.increaseP2Score();
+  }
+
+  private increaseP1Score(): void {
+    this.player1Score++;
+  }
+
+  private increaseP2Score(): void {
+    this.player2Score++;
   }
 }
